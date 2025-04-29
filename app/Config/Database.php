@@ -169,7 +169,7 @@ class Database extends Config
         'DBDriver'    => 'MySQLi',
         'DBPrefix'    => '',  // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
         'pConnect'    => false,
-        'DBDebug'     => true,
+        'DBDebug'     => (ENVIRONMENT !== 'production'),
         'charset'     => 'utf8',
         'DBCollat'    => '',
         'swapPre'     => '',
