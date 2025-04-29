@@ -1,10 +1,7 @@
-name: PHPUnit Tests
+name: Run PHPUnit Tests
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -13,17 +10,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4.6' # Version à adapter selon le projet
-          extensions: mbstring, intl, bcmath, pdo, mysqli
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.0'
 
-      - name: Install Composer dependencies
-        run: composer install --no-interaction
+    - name: Install dependencies
+      run: |
+        composer install
+        composer require kint-php/kint:"^4.1"   # This will install the right Kint version
+        composer update
 
-      - name: Run PHPUnit tests
-        run: ./vendor/bin/phpunit --coverage-text
+    - name: Run PHPUnit
+      run: ./vendor/bin/phpunit --coverage-text
