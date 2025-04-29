@@ -5,7 +5,7 @@ use CodeIgniter\Model;
 class ArticleModel extends Model{
     protected $table = 'Article';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['nom','reference','quantity'];
+    protected $allowedFields = ['libelle','reference','quantity'];
 
     protected $validationRules = [
         'reference' => 'required',

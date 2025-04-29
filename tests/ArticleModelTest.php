@@ -23,8 +23,9 @@ class ArticleModelTest extends TestCase
     public function testInsertValidArticle()
     {
         $data = [
-            'libelle'   => 'HP Elite Book',
+           
             'reference' => 'HP-123456',
+            'libelle'   => 'HP Elite Book',
             'quantity'  => 10
         ];
 
