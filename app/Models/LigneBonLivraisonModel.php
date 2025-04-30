@@ -15,3 +15,4 @@ class LigneBonLivraisonModel extends Model
         'qte' => 'required|integer',
     ];
 }
+?>
