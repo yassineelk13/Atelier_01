@@ -17,7 +17,7 @@ jobs:
           - 3306:3306
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: ci4_test
+          MYSQL_DATABASE: atelier1
           MYSQL_USER: ci4
           MYSQL_PASSWORD: secret
         options: >-
@@ -33,26 +33,25 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # PHP 8.4 not officially released; use stable
+          php-version: '8.2'  # Use stable PHP version
           extensions: mbstring, intl, bcmath, pdo, mysqli, xdebug
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
 
       - name: Wait for MySQL
-        run: sleep 15
+        run: sleep 15  # Wait for MySQL to be fully initialized
 
       - name: Create test database structure
         run: |
           sudo apt-get update
           sudo apt-get install -y mysql-client
-          mysql -h 127.0.0.1 -u root -proot atelier1 < tests/_support/atelier1_test.sql
-
+          mysql -h 127.0.0.1 -u ci4 -psecret atelier1 < tests/_support/atelier1_test.sql
 
       - name: Run PHPUnit tests
         env:
           database.tests.hostname: 127.0.0.1
-          database.tests.database: ci4_test
+          database.tests.database: atelier1  # Use the correct database name
           database.tests.username: ci4
           database.tests.password: secret
           database.tests.DBDriver: MySQLi
