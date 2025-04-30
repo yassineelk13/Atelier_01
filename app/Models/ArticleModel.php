@@ -3,7 +3,7 @@ namespace App\Models;
 use CodeIgniter\Model;
 
 class ArticleModel extends Model{
-    protected $table = 'Article';
+    protected $table = 'article';
     protected $primaryKey = 'id';
     protected $allowedFields = ['libelle','reference','quantity'];
 
