@@ -2,9 +2,11 @@ name: PHPUnit Tests
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   test:
@@ -13,13 +15,13 @@ jobs:
     services:
       mysql:
         image: mysql:8.0
-        ports:
-          - 3306:3306
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: atelier1
-          MYSQL_USER: ci4
-          MYSQL_PASSWORD: secret
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_password
+        ports:
+          - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
@@ -33,33 +35,29 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'  # Use stable PHP version
-          extensions: mbstring, intl, bcmath, pdo, mysqli, xdebug
+          php-version: '8.1'
+          extensions: mbstring, intl, bcmath, pdo_mysql
+          coverage: xdebug
 
-      - name: Install Composer dependencies
+      - name: Set up environment variables
+        run: cp .env.github .env
+
+      - name: Show .env file content (debug)
+        run: cat .env
+
+      - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Wait for MySQL
-        run: sleep 15  # Wait for MySQL to be fully initialized
-
-      - name: Create test database structure
+      - name: Wait for MySQL to be ready
         run: |
-          sudo apt-get update
-          sudo apt-get install -y mysql-client
-          mysql -h 127.0.0.1 -u ci4 -psecret atelier1 < tests/_support/atelier1_test.sql
-          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS atelier1;"
-          mysql -h 127.0.0.1 -u root -proot atelier1 < tests/_support/atelier1_test.sql
-          run: |
-    
+          until mysqladmin ping -h127.0.0.1 -uroot -proot --silent; do
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
 
-          
+      - name: Execute schema.sql to create tables
+        run: |
+          mysql -h127.0.0.1 -utest_user -ptest_password atelier1 < schema.sql
 
       - name: Run PHPUnit tests
-        env:
-          database.tests.hostname: 127.0.0.1
-          database.tests.database: atelier1  # Use the correct database name
-          database.tests.username: ci4
-          database.tests.password: secret
-          database.tests.DBDriver: MySQLi
-          database.tests.DBPrefix: ''
-        run: ./vendor/bin/phpunit --coverage-text
+        run: vendor/bin/phpunit --colors=always --coverage-text
